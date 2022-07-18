@@ -179,9 +179,11 @@ while loop:
         if event.type == pg.QUIT:
             loop = False
         elif event.type == MOUSEBUTTONDOWN and event.button == 1:
+            # Hit reset buttun
             if reset_btn.collidepoint(pg.mouse.get_pos()):
                 board_num = copy.deepcopy(reset_board)
                 start = time.time()
+            # Hit highlight button
             elif highlight_btn.collidepoint(pg.mouse.get_pos()):
                 highlight_on = not highlight_on
                 if highlight_on:
