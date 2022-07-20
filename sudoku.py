@@ -2,9 +2,11 @@ import pygame as pg
 from pygame.locals import *
 import copy
 import time
+import random
 
 #END GAME
 lost = False
+lose_strike = 0
 
 #COLORS
 Background = (200, 200, 200)
@@ -20,16 +22,15 @@ highlight_on = True
 
 #BOARD
 board_num = [
-    [0, 3, 0, 1, 0, 6, 0, 0, 0],
-    [0, 0, 2, 0, 0, 0, 0, 0, 0],
-    [0, 0, 9, 0, 3, 7, 0, 5, 0],
-    [7, 0, 0, 0, 0, 0, 0, 9, 5],
-    [0, 1, 0, 8, 0, 5, 0, 6, 0],
-    [4, 9, 0, 0, 0, 0, 0, 0, 3],
-    [0, 5, 0, 3, 7, 0, 6, 0, 0],
-    [0, 0, 0, 0, 0, 0, 8, 0, 0],
-    [0, 0, 0, 6, 0, 8, 0, 1, 0]]
-reset_board = copy.deepcopy(board_num)
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0]]
 solve_board = [[]]
 
 #FPS
@@ -52,10 +53,35 @@ highlight_btn_col = Green
 #TIME
 start = time.time()
 
+#Default mouse position
+pos_write_num = (0, 0)
+
+# Function creating board depending on chosen lvl
+def create_board():
+    global board_num
+    board_num = [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0]]
+    num = 0
+    while num < 30:
+        pos_x = random.randrange(0, 8)
+        pos_y = random.randrange(0, 8)
+        numb = random.randrange(1, 10)
+        if possible(pos_y, pos_x, numb) and board_num[pos_y][pos_x] == 0:
+            num += 1
+            board_num[pos_y][pos_x] = numb
+    return board_num
+
 # Function drawing board with numbers
 def draw_board(mouse_pos, play_time):
-    global lost, start, board_num, reset_board
-    lose_strike = 0
+    global lost, start, board_num, reset_board, lose_strike
     # Rectangle parameters
     width = 100
     height = 100
@@ -65,6 +91,7 @@ def draw_board(mouse_pos, play_time):
     # Highlight rectangle parameters
     pos_x_highlight = ((mouse_pos[0] - 25) // 100) * 100 + 25
     pos_y_highlight = ((mouse_pos[1] - 50) // 100) * 100 + 50
+    #Screen refreshing only if player didn't lose
     if not lost:
         screen.fill(Background)
         screen.blit(font_button.render(time_format(play_time), True, Black), (400, 10))
@@ -76,21 +103,21 @@ def draw_board(mouse_pos, play_time):
         for i in range(0, 10):
             for j in range(0, 10):
                 if j < 9 and i < 9 and board_num[j][i] != 0:
+                    # Numbers, that is untouchable will be black, wrong numbers will be red, user input number will be gray
                     if board_num[j][i] == reset_board[j][i]:
                         screen.blit(font.render(str(board_num[j][i]), True, Black), (pos_x + 25 + (i * 100), pos_y + (j * 100)))
-                    elif board_num[j][i] != solve_board[j][i]:
-                        lose_strike += 1
-                        if lose_strike >= 3:
-                            lost = True
+                    elif len(solve_board) > 1 and board_num[j][i] != solve_board[j][i]:
                         screen.blit(font.render(str(board_num[j][i]), True, Red), (pos_x + 25 + (i * 100), pos_y + (j * 100)))
                     else:
                         screen.blit(font.render(str(board_num[j][i]), True, Gray), (pos_x + 25 + (i * 100), pos_y + (j * 100)))
+                # Drawing board
                 if j % 3 == 0 and i == 0:
                     pg.draw.line(screen, Black, (25 + j * 100, 50), (25 + j * 100, 950), 5)
                     pg.draw.line(screen, Black, (23, 50 + j * 100), (927, 50 + j * 100), 5)
                 elif i == 0:
                     pg.draw.line(screen, Black, (25 + j * 100, 50), (25 + j * 100, 950), 2)
                     pg.draw.line(screen, Black, (23, 50 + j * 100), (927, 50 + j * 100), 2)
+    # If it's lost board will freeze and labels will show
     else:
         screen.blit(font.render("Game over", True, Red), (250, 400))
         if screen.blit(font_button.render("Play again", True, Red), (400, 500)).collidepoint(pg.mouse.get_pos()):
@@ -99,6 +126,7 @@ def draw_board(mouse_pos, play_time):
                 start = time.time()
                 board_num = copy.deepcopy(reset_board)
                 lost = False
+                lose_strike = 0
         else:
             screen.blit(font_button.render("Play again", True, Red), (400, 500))
             
@@ -133,30 +161,38 @@ def solve():
                 return
     solve_board = copy.deepcopy(board_num)
 
-# Function writing number on specific position from user 
+# Function writing number on specific position from user and counting wrong numbers
+#! PROBLEM: Repair wrong numbers count
 def user_input(position_num):
+    global lose_strike, lost
     pos_x = ((position_num[0] - 25) // 100)
     pos_y = ((position_num[1] - 50) // 100)
-    if (event.key == pg.K_1 or event.key == pg.K_KP1) and board_num[pos_y][pos_x] == 0:
-        board_num[pos_y][pos_x] = 1
-    elif (event.key == pg.K_2 or event.key == pg.K_KP2) and board_num[pos_y][pos_x] == 0:
-        board_num[pos_y][pos_x] = 2
-    elif (event.key == pg.K_3 or event.key == pg.K_KP3) and board_num[pos_y][pos_x] == 0:
-        board_num[pos_y][pos_x] = 3
-    elif (event.key == pg.K_4 or event.key == pg.K_KP4) and board_num[pos_y][pos_x] == 0:
-        board_num[pos_y][pos_x] = 4
-    elif (event.key == pg.K_5 or event.key == pg.K_KP5) and board_num[pos_y][pos_x] == 0:
-        board_num[pos_y][pos_x] = 5
-    elif (event.key == pg.K_6 or event.key == pg.K_KP6) and board_num[pos_y][pos_x] == 0:
-        board_num[pos_y][pos_x] = 6
-    elif (event.key == pg.K_7 or event.key == pg.K_KP7) and board_num[pos_y][pos_x] == 0:
-        board_num[pos_y][pos_x] = 7
-    elif (event.key == pg.K_8 or event.key == pg.K_KP8) and board_num[pos_y][pos_x] == 0:
-        board_num[pos_y][pos_x] = 8
-    elif (event.key == pg.K_9 or event.key == pg.K_KP9) and board_num[pos_y][pos_x] == 0:
-        board_num[pos_y][pos_x] = 9
-    elif (event.key == pg.K_BACKSPACE) and reset_board[pos_y][pos_x] == 0:
-            board_num[pos_y][pos_x] = 0
+    if pos_x >= 0 and pos_x < 9 and pos_y >= 0 and pos_y < 9:
+        if (event.key == pg.K_1 or event.key == pg.K_KP1) and board_num[pos_y][pos_x] == 0:
+            board_num[pos_y][pos_x] = 1
+        elif (event.key == pg.K_2 or event.key == pg.K_KP2) and board_num[pos_y][pos_x] == 0:
+            board_num[pos_y][pos_x] = 2
+        elif (event.key == pg.K_3 or event.key == pg.K_KP3) and board_num[pos_y][pos_x] == 0:
+            board_num[pos_y][pos_x] = 3
+        elif (event.key == pg.K_4 or event.key == pg.K_KP4) and board_num[pos_y][pos_x] == 0:
+            board_num[pos_y][pos_x] = 4
+        elif (event.key == pg.K_5 or event.key == pg.K_KP5) and board_num[pos_y][pos_x] == 0:
+            board_num[pos_y][pos_x] = 5
+        elif (event.key == pg.K_6 or event.key == pg.K_KP6) and board_num[pos_y][pos_x] == 0:
+            board_num[pos_y][pos_x] = 6
+        elif (event.key == pg.K_7 or event.key == pg.K_KP7) and board_num[pos_y][pos_x] == 0:
+            board_num[pos_y][pos_x] = 7
+        elif (event.key == pg.K_8 or event.key == pg.K_KP8) and board_num[pos_y][pos_x] == 0:
+            board_num[pos_y][pos_x] = 8
+        elif (event.key == pg.K_9 or event.key == pg.K_KP9) and board_num[pos_y][pos_x] == 0:
+            board_num[pos_y][pos_x] = 9
+        elif (event.key == pg.K_BACKSPACE) and reset_board[pos_y][pos_x] == 0:
+                board_num[pos_y][pos_x] = 0
+        
+        if board_num[pos_y][pos_x] != solve_board[pos_y][pos_x]:
+            lose_strike += 1
+        if lose_strike == 4:
+            lost = True
 
 # Function converting time to min and sec
 def time_format(times):
@@ -166,7 +202,13 @@ def time_format(times):
     return format
 
 loop = True
+# While loop will work that long as created random board is solvable
+board_num = copy.deepcopy(create_board())
 solve()
+while len(solve_board) == 1:
+    board_num = copy.deepcopy(create_board())
+    solve()
+reset_board = copy.deepcopy(board_num)
 
 while loop:
     play_time = round(time.time() - start) # Calculating play time in sec 
@@ -183,6 +225,7 @@ while loop:
             if reset_btn.collidepoint(pg.mouse.get_pos()):
                 board_num = copy.deepcopy(reset_board)
                 start = time.time()
+                lose_strike = 0
             # Hit highlight button
             elif highlight_btn.collidepoint(pg.mouse.get_pos()):
                 highlight_on = not highlight_on
