@@ -117,7 +117,7 @@ def draw_board(mouse_pos, play_time):
                 elif i == 0:
                     pg.draw.line(screen, Black, (25 + j * 100, 50), (25 + j * 100, 950), 2)
                     pg.draw.line(screen, Black, (23, 50 + j * 100), (927, 50 + j * 100), 2)
-    # If it's lost board will freeze and labels will show
+    # If it's lost board will freeze and labels will show up
     else:
         screen.blit(font.render("Game over", True, Red), (250, 400))
         if screen.blit(font_button.render("Play again", True, Red), (400, 500)).collidepoint(pg.mouse.get_pos()):
@@ -162,7 +162,6 @@ def solve():
     solve_board = copy.deepcopy(board_num)
 
 # Function writing number on specific position from user and counting wrong numbers
-#! PROBLEM: Repair wrong numbers count
 def user_input(position_num):
     global lose_strike, lost
     pos_x = ((position_num[0] - 25) // 100)
@@ -199,6 +198,11 @@ def time_format(times):
     format = str(minute) + " min " + str(sec) + " sec"
     return format
 
+# Function creating buttons
+def buttons(btn_color, btn_rec, btn_label, btn_pos):
+    pg.draw.rect(screen, btn_color, btn_rec)
+    screen.blit(font_button.render(btn_label, True, Black), btn_pos)
+
 loop = True
 # While loop will work that long as created random board is solvable
 board_num = copy.deepcopy(create_board())
@@ -211,10 +215,8 @@ reset_board = copy.deepcopy(board_num)
 while loop:
     play_time = round(time.time() - start) # Calculating play time in sec 
     draw_board(pg.mouse.get_pos(), play_time)
-    pg.draw.rect(screen, reset_btn_col, reset_btn)
-    screen.blit(font_button.render("Reset", True, Black), (80, 990))
-    pg.draw.rect(screen, highlight_btn_col, highlight_btn)
-    screen.blit(font_button.render("Highlight", True, Black), (230, 990))
+    buttons(reset_btn_col, reset_btn, "Reset", (80, 990))
+    buttons(highlight_btn_col, highlight_btn, "Highlight", (230, 990))
     for event in pg.event.get():
         if event.type == pg.QUIT:
             loop = False
