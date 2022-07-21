@@ -2,8 +2,13 @@
 # General info
 Hello, this is my first project by my self in python. It's very basic idea of sudoku created using pygame. It include highlighting row and column with a current position of your mouse (you can turn that off). It has also solver to create random new board.
 # :fire: Presentation
+<<<<<<< HEAD
 ## :gem: Highlight
 Wherever your cursor is pointing, row and column will be highlighted. You can all so disable this future, by clicking in green rectangle.
+=======
+## Highlight
+Wherever your cursor is pointing, row and column will be highlighted. You can also disable this future, by clicking in green rectangle.
+>>>>>>> 4f636f548cd01f84686c18f15f2ab4355dd95c03
 
 <div id="header" align="center">
     <img src=./Photos/Board_with_highlight.gif>
