@@ -1,6 +1,13 @@
-# ⚠️WORK IN PROGRESS
-# General info
+# :round_pushpin: General info
 Hello, this is my first project by my self in python. It's very basic idea of sudoku created using pygame. It include highlighting row and column with a current position of your mouse (you can turn that off). It has also solver to create random new board.
+# :open_file_folder: Table of Contents
+* [Presentation](#fire-presentation)
+* [Highlight](#gem-highlight)
+* [Lost the game](#x-lost-the-game)
+* [Reset Board](#arrowscounterclockwise-reset-board)
+* [Solver](#ghost-solver)
+* [Future functions](#bulb-future-functions)
+
 # :fire: Presentation
 
 ## :gem: Highlight
@@ -26,3 +33,11 @@ If you don't put up with mistakes, there is tiny black rectangle with label "Res
 
 ## :ghost: Solver
 I used solver from this YouTube video :point_right: https://youtu.be/G_UYXzGuqvM
+
+# :bulb: Future Functions
+* :lock: Menu
+* :lock: Difficult levels
+* :lock: Highlight other numbers on click
+* :lock: Game over
+
+
