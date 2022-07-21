@@ -168,26 +168,24 @@ def user_input(position_num):
     pos_x = ((position_num[0] - 25) // 100)
     pos_y = ((position_num[1] - 50) // 100)
     if pos_x >= 0 and pos_x < 9 and pos_y >= 0 and pos_y < 9:
-        if (event.key == pg.K_1 or event.key == pg.K_KP1) and board_num[pos_y][pos_x] == 0:
+        if (event.key == pg.K_1 or event.key == pg.K_KP1) and reset_board[pos_y][pos_x] == 0:
             board_num[pos_y][pos_x] = 1
-        elif (event.key == pg.K_2 or event.key == pg.K_KP2) and board_num[pos_y][pos_x] == 0:
+        elif (event.key == pg.K_2 or event.key == pg.K_KP2) and reset_board[pos_y][pos_x] == 0:
             board_num[pos_y][pos_x] = 2
-        elif (event.key == pg.K_3 or event.key == pg.K_KP3) and board_num[pos_y][pos_x] == 0:
+        elif (event.key == pg.K_3 or event.key == pg.K_KP3) and reset_board[pos_y][pos_x] == 0:
             board_num[pos_y][pos_x] = 3
-        elif (event.key == pg.K_4 or event.key == pg.K_KP4) and board_num[pos_y][pos_x] == 0:
+        elif (event.key == pg.K_4 or event.key == pg.K_KP4) and reset_board[pos_y][pos_x] == 0:
             board_num[pos_y][pos_x] = 4
-        elif (event.key == pg.K_5 or event.key == pg.K_KP5) and board_num[pos_y][pos_x] == 0:
+        elif (event.key == pg.K_5 or event.key == pg.K_KP5) and reset_board[pos_y][pos_x] == 0:
             board_num[pos_y][pos_x] = 5
-        elif (event.key == pg.K_6 or event.key == pg.K_KP6) and board_num[pos_y][pos_x] == 0:
+        elif (event.key == pg.K_6 or event.key == pg.K_KP6) and reset_board[pos_y][pos_x] == 0:
             board_num[pos_y][pos_x] = 6
-        elif (event.key == pg.K_7 or event.key == pg.K_KP7) and board_num[pos_y][pos_x] == 0:
+        elif (event.key == pg.K_7 or event.key == pg.K_KP7) and reset_board[pos_y][pos_x] == 0:
             board_num[pos_y][pos_x] = 7
-        elif (event.key == pg.K_8 or event.key == pg.K_KP8) and board_num[pos_y][pos_x] == 0:
+        elif (event.key == pg.K_8 or event.key == pg.K_KP8) and reset_board[pos_y][pos_x] == 0:
             board_num[pos_y][pos_x] = 8
-        elif (event.key == pg.K_9 or event.key == pg.K_KP9) and board_num[pos_y][pos_x] == 0:
+        elif (event.key == pg.K_9 or event.key == pg.K_KP9) and reset_board[pos_y][pos_x] == 0:
             board_num[pos_y][pos_x] = 9
-        elif (event.key == pg.K_BACKSPACE) and reset_board[pos_y][pos_x] == 0:
-                board_num[pos_y][pos_x] = 0
         
         if board_num[pos_y][pos_x] != solve_board[pos_y][pos_x]:
             lose_strike += 1
