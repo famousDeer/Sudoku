@@ -10,6 +10,13 @@ Hello, this is my first project by my self in python. It's very basic idea of su
 
 # :fire: Presentation
 
+## :page_facing_up: Menu
+You have 3 levels to choose. Levels depends on how many numbers you will see on the board.
+
+<div id="header" align="center">
+    <img src=./Photos/menu.gif>
+</div>
+
 ## :gem: Highlight
 Wherever your cursor is pointing, row and column will be highlighted. You can all so disable this future, by clicking in green rectangle.
 
@@ -31,13 +38,24 @@ If you don't put up with mistakes, there is tiny black rectangle with label "Res
     <img src=./Photos/Reset.gif>
 </div>
 
+## :back: New Game
+If you wanna start new game, just click white button and choose level again
+
+<div id="header" align="center">
+    <img src=./Photos/New_Game.gif>
+</div>
+
 ## :ghost: Solver
 I used solver from this YouTube video :point_right: https://youtu.be/G_UYXzGuqvM
 
 # :bulb: Future Functions
-* :lock: Menu
-* :lock: Difficult levels
+* :heavy_check_mark: Game over create new board
+* :heavy_check_mark: Menu
+* :heavy_check_mark: Difficult levels
+* :heavy_check_mark: New Game button
 * :lock: Highlight other numbers on click
-* :lock: Game over
-
-
+* :lock: Complete level window
+# :lady_beetle: Known Issues
+* :x: New Game button do not create new board
+* :x: First load is very long
+* :x: Any button can count as a wrong number

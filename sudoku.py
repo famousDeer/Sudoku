@@ -31,6 +31,7 @@ board_num = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0]]
+reset_board = copy.deepcopy(board_num)
 solve_board = [[]]
 
 #FPS
@@ -49,16 +50,22 @@ reset_btn = pg.Rect(50, 1000, 20, 20)
 reset_btn_col = Black
 highlight_btn = pg.Rect(200, 1000, 20, 20)
 highlight_btn_col = Green
+new_game_btn = pg.Rect(400, 1000, 20, 20)
+new_game_btn_col = White
 
 #TIME
 start = time.time()
 
 #Default mouse position
 pos_write_num = (0, 0)
+mouse_pos_click = (0, 0)
+
+#DIFFICULTY
+level = 0
 
 # Function creating board depending on chosen lvl
-def create_board():
-    global board_num
+def create_board(level):
+    global board_num, reset_board, solve_board
     board_num = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -70,18 +77,21 @@ def create_board():
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0]]
     num = 0
-    while num < 30:
-        pos_x = random.randrange(0, 8)
-        pos_y = random.randrange(0, 8)
+    while num < level:
+        pos_x = random.randrange(0, 9)
+        pos_y = random.randrange(0, 9)
         numb = random.randrange(1, 10)
         if possible(pos_y, pos_x, numb) and board_num[pos_y][pos_x] == 0:
             num += 1
             board_num[pos_y][pos_x] = numb
+    solve()
+    if len(solve_board) == 1:
+        board_num = copy.deepcopy(create_board(level))
     return board_num
 
 # Function drawing board with numbers
-def draw_board(mouse_pos, play_time):
-    global lost, start, board_num, reset_board, lose_strike
+def draw_board(mouse_pos, play_time, mouse_pos_click):
+    global lost, start, board_num, reset_board, lose_strike, level
     # Rectangle parameters
     width = 100
     height = 100
@@ -91,32 +101,45 @@ def draw_board(mouse_pos, play_time):
     # Highlight rectangle parameters
     pos_x_highlight = ((mouse_pos[0] - 25) // 100) * 100 + 25
     pos_y_highlight = ((mouse_pos[1] - 50) // 100) * 100 + 50
+
+    # Rectangle on click position
+    pos_x_mouse = ((mouse_pos_click[0] - 25) // 100) * 100 + 25
+    pos_y_mouse = ((mouse_pos_click[1] - 50) // 100) * 100 + 50
     #Screen refreshing only if player didn't lose
     if not lost:
         screen.fill(Background)
-        screen.blit(font_button.render(time_format(play_time), True, Black), (400, 10))
-        if highlight_on:
-            if pos_x_highlight >= 25 and pos_x_highlight < 925 and pos_y_highlight >= 50 and pos_y_highlight < 950:
-                pg.draw.rect(screen, colour_highlight, (pos_x_highlight, 50, width, 900))
-                pg.draw.rect(screen, colour_highlight, (25, pos_y_highlight, 900, height))
-        # Drawing a board using line 
-        for i in range(0, 10):
-            for j in range(0, 10):
-                if j < 9 and i < 9 and board_num[j][i] != 0:
-                    # Numbers, that is untouchable will be black, wrong numbers will be red, user input number will be gray
-                    if board_num[j][i] == reset_board[j][i]:
-                        screen.blit(font.render(str(board_num[j][i]), True, Black), (pos_x + 25 + (i * 100), pos_y + (j * 100)))
-                    elif len(solve_board) > 1 and board_num[j][i] != solve_board[j][i]:
-                        screen.blit(font.render(str(board_num[j][i]), True, Red), (pos_x + 25 + (i * 100), pos_y + (j * 100)))
-                    else:
-                        screen.blit(font.render(str(board_num[j][i]), True, Gray), (pos_x + 25 + (i * 100), pos_y + (j * 100)))
-                # Drawing board
-                if j % 3 == 0 and i == 0:
-                    pg.draw.line(screen, Black, (25 + j * 100, 50), (25 + j * 100, 950), 5)
-                    pg.draw.line(screen, Black, (23, 50 + j * 100), (927, 50 + j * 100), 5)
-                elif i == 0:
-                    pg.draw.line(screen, Black, (25 + j * 100, 50), (25 + j * 100, 950), 2)
-                    pg.draw.line(screen, Black, (23, 50 + j * 100), (927, 50 + j * 100), 2)
+        if level > 0:
+            buttons(reset_btn_col, reset_btn, "Reset", (80, 990))
+            buttons(highlight_btn_col, highlight_btn, "Highlight", (230, 990))
+            buttons(new_game_btn_col, new_game_btn, "New Game", (430, 990))
+            screen.blit(font_button.render(time_format(play_time), True, Black), (400, 10))
+            if highlight_on:
+                if pos_x_highlight >= 25 and pos_x_highlight < 925 and pos_y_highlight >= 50 and pos_y_highlight < 950:
+                    pg.draw.rect(screen, colour_highlight, (pos_x_highlight, 50, width, 900))
+                    pg.draw.rect(screen, colour_highlight, (25, pos_y_highlight, 900, height))
+            # Drawing a board using line 
+            for i in range(0, 10):
+                for j in range(0, 10):
+                    if j < 9 and i < 9 and board_num[j][i] != 0:
+                        # Numbers, that is untouchable will be black, wrong numbers will be red, user input number will be gray
+                        if board_num[j][i] == reset_board[j][i]:
+                            screen.blit(font.render(str(board_num[j][i]), True, Black), (pos_x + 25 + (i * 100), pos_y + (j * 100)))
+                        elif len(solve_board) > 1 and board_num[j][i] != solve_board[j][i]:
+                            screen.blit(font.render(str(board_num[j][i]), True, Red), (pos_x + 25 + (i * 100), pos_y + (j * 100)))
+                        else:
+                            screen.blit(font.render(str(board_num[j][i]), True, Gray), (pos_x + 25 + (i * 100), pos_y + (j * 100)))
+                    # Drawing board
+                    if j % 3 == 0 and i == 0:
+                        pg.draw.line(screen, Black, (25 + j * 100, 50), (25 + j * 100, 950), 5)
+                        pg.draw.line(screen, Black, (23, 50 + j * 100), (927, 50 + j * 100), 5)
+                    elif i == 0:
+                        pg.draw.line(screen, Black, (25 + j * 100, 50), (25 + j * 100, 950), 2)
+                        pg.draw.line(screen, Black, (23, 50 + j * 100), (927, 50 + j * 100), 2)
+            if pos_x_mouse >= 25 and pos_x_mouse < 925 and pos_y_mouse >= 50 and pos_y_mouse < 950:
+                pg.draw.rect(screen, Red, (pos_x_mouse, pos_y_mouse, width, height), 5)
+        else:
+            level = copy.deepcopy(menu())
+            start = time.time()
     # If it's lost board will freeze and labels will show up
     else:
         screen.blit(font.render("Game over", True, Red), (250, 400))
@@ -124,7 +147,11 @@ def draw_board(mouse_pos, play_time):
             screen.blit(font_button.render("Play again", True, Gray), (400, 500))
             if event.type == MOUSEBUTTONDOWN and event.button == 1:
                 start = time.time()
-                board_num = copy.deepcopy(reset_board)
+                board_num = create_board(level)
+                while len(solve_board) == 1:
+                    board_num = create_board(level)
+                    solve()
+                reset_board = copy.deepcopy(board_num)
                 lost = False
                 lose_strike = 0
         else:
@@ -203,24 +230,51 @@ def buttons(btn_color, btn_rec, btn_label, btn_pos):
     pg.draw.rect(screen, btn_color, btn_rec)
     screen.blit(font_button.render(btn_label, True, Black), btn_pos)
 
+# Function creating menu
+def menu():
+    global level, board_num, reset_board, loop
+    easy_btn = pg.Rect(375, 450, 200, 50)
+    medium_btn = pg.Rect(375, 525, 200, 50)
+    hard_btn = pg.Rect(375, 600, 200, 50)
+    mouse_pos = pg.mouse.get_pos()
+    if easy_btn.collidepoint(mouse_pos):
+        pg.draw.rect(screen, colour_highlight, easy_btn)
+    elif medium_btn.collidepoint(mouse_pos):
+        pg.draw.rect(screen, colour_highlight, medium_btn)
+    elif hard_btn.collidepoint(mouse_pos):
+        pg.draw.rect(screen, colour_highlight, hard_btn)
+    pg.draw.rect(screen, Black, easy_btn, 2)
+    pg.draw.rect(screen, Black, medium_btn, 2)
+    pg.draw.rect(screen, Black, hard_btn, 2)
+    screen.blit(font_button.render("Easy", True, Black), (435, 455))
+    screen.blit(font_button.render("Medium", True, Black), (415, 530))
+    screen.blit(font_button.render("Hard", True, Black), (435, 605))
+    for event in pg.event.get():
+        if event.type == pg.QUIT:
+            loop = False
+        if event.type == MOUSEBUTTONDOWN and event.button == 1:
+            if easy_btn.collidepoint(mouse_pos):
+                level = 32
+            elif medium_btn.collidepoint(mouse_pos):
+                level = 30
+            elif hard_btn.collidepoint(mouse_pos):
+                level = 26           
+    if level > 0:
+        board_num = create_board(level)
+        reset_board = copy.deepcopy(board_num)
+    return level
+
 loop = True
-# While loop will work that long as created random board is solvable
-board_num = copy.deepcopy(create_board())
-solve()
-while len(solve_board) == 1:
-    board_num = copy.deepcopy(create_board())
-    solve()
-reset_board = copy.deepcopy(board_num)
 
 while loop:
     play_time = round(time.time() - start) # Calculating play time in sec 
-    draw_board(pg.mouse.get_pos(), play_time)
-    buttons(reset_btn_col, reset_btn, "Reset", (80, 990))
-    buttons(highlight_btn_col, highlight_btn, "Highlight", (230, 990))
+    draw_board(pg.mouse.get_pos(), play_time, mouse_pos_click)
     for event in pg.event.get():
         if event.type == pg.QUIT:
             loop = False
         elif event.type == MOUSEBUTTONDOWN and event.button == 1:
+            # Mouse click position
+            mouse_pos_click = pg.mouse.get_pos()
             # Hit reset buttun
             if reset_btn.collidepoint(pg.mouse.get_pos()):
                 board_num = copy.deepcopy(reset_board)
@@ -233,6 +287,9 @@ while loop:
                     highlight_btn_col = Green
                 else:
                     highlight_btn_col = Gray
+            # Hit new game button
+            elif new_game_btn.collidepoint(pg.mouse.get_pos()):
+                level = 0
             pos_write_num = pg.mouse.get_pos()
         elif event.type == pg.KEYUP:
             user_input(pos_write_num)
