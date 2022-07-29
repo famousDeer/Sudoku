@@ -14,7 +14,7 @@ Hello, this is my first project by my self in python. It's very basic idea of su
 You have 3 levels to choose. Levels depends on how many numbers you will see on the board.
 
 <div id="header" align="center">
-    <img src=./Photos/menu.gif>
+    <img src=./Photos/Menu.gif>
 </div>
 
 ## :gem: Highlight
