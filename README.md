@@ -21,7 +21,7 @@ You have 3 levels to choose. Levels depends on how many numbers you will see on 
 </div>
 
 ## :gem: Highlight
-Wherever your cursor is pointing, row and column will be highlighted. You can all so disable this future, by clicking in green rectangle.
+Wherever your cursor is pointing, row and column will be highlighted. You can also disable this future, by clicking in green rectangle.
 
 <div id="header" align="center">
     <img src=./Photos/Board_with_highlight.gif>
