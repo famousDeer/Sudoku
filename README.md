@@ -59,6 +59,6 @@ I used solver from this YouTube video :point_right: https://youtu.be/G_UYXzGuqvM
 * :lock: Highlight other numbers on click
 * :lock: Complete level window
 # :lady_beetle: Known Issues
-* :x: New Game button do not create new board
+* :heavy_check_mark: ~~New Game button do not create new board~~
 * :x: First load is very long
 * :x: Any button can count as a wrong number

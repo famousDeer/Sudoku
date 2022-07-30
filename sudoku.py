@@ -105,6 +105,7 @@ def draw_board(mouse_pos, play_time, mouse_pos_click):
     # Rectangle on click position
     pos_x_mouse = ((mouse_pos_click[0] - 25) // 100) * 100 + 25
     pos_y_mouse = ((mouse_pos_click[1] - 50) // 100) * 100 + 50
+
     #Screen refreshing only if player didn't lose
     if not lost:
         screen.fill(Background)
@@ -230,25 +231,23 @@ def buttons(btn_color, btn_rec, btn_label, btn_pos):
     pg.draw.rect(screen, btn_color, btn_rec)
     screen.blit(font_button.render(btn_label, True, Black), btn_pos)
 
+# Function creating menu buttons
+def menu_buttons(btn_rec, btn_label, label_pos, mouse_pos):
+    if btn_rec.collidepoint(mouse_pos):
+        pg.draw.rect(screen, colour_highlight, btn_rec)
+    pg.draw.rect(screen, Black, btn_rec, 2)
+    screen.blit(font_button.render(btn_label, True, Black), label_pos)
+    
 # Function creating menu
 def menu():
     global level, board_num, reset_board, loop
+    mouse_pos = pg.mouse.get_pos()
     easy_btn = pg.Rect(375, 450, 200, 50)
     medium_btn = pg.Rect(375, 525, 200, 50)
     hard_btn = pg.Rect(375, 600, 200, 50)
-    mouse_pos = pg.mouse.get_pos()
-    if easy_btn.collidepoint(mouse_pos):
-        pg.draw.rect(screen, colour_highlight, easy_btn)
-    elif medium_btn.collidepoint(mouse_pos):
-        pg.draw.rect(screen, colour_highlight, medium_btn)
-    elif hard_btn.collidepoint(mouse_pos):
-        pg.draw.rect(screen, colour_highlight, hard_btn)
-    pg.draw.rect(screen, Black, easy_btn, 2)
-    pg.draw.rect(screen, Black, medium_btn, 2)
-    pg.draw.rect(screen, Black, hard_btn, 2)
-    screen.blit(font_button.render("Easy", True, Black), (435, 455))
-    screen.blit(font_button.render("Medium", True, Black), (415, 530))
-    screen.blit(font_button.render("Hard", True, Black), (435, 605))
+    menu_buttons(easy_btn, "Easy", (435, 455), mouse_pos)
+    menu_buttons(medium_btn, "Medium", (415, 530), mouse_pos)
+    menu_buttons(hard_btn, "Hard", (435, 605), mouse_pos)
     for event in pg.event.get():
         if event.type == pg.QUIT:
             loop = False
@@ -290,6 +289,7 @@ while loop:
             # Hit new game button
             elif new_game_btn.collidepoint(pg.mouse.get_pos()):
                 level = 0
+                solve_board = [[]]
             pos_write_num = pg.mouse.get_pos()
         elif event.type == pg.KEYUP:
             user_input(pos_write_num)
