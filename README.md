@@ -60,5 +60,5 @@ I used solver from this YouTube video :point_right: https://youtu.be/G_UYXzGuqvM
 * :lock: Complete level window
 # :lady_beetle: Known Issues
 * :heavy_check_mark: ~~New Game button do not create new board~~
-* :x: First load is very long
+* :x: First load is sometimes very long
 * :x: Any button can count as a wrong number
