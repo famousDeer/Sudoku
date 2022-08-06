@@ -3,6 +3,7 @@ from pygame.locals import *
 import copy
 import time
 import random
+import pulp as plp
 
 #END GAME
 lost = False
@@ -84,14 +85,14 @@ def create_board(level):
         if possible(pos_y, pos_x, numb) and board_num[pos_y][pos_x] == 0:
             num += 1
             board_num[pos_y][pos_x] = numb
-    solve()
+    solve(board_num)
     if len(solve_board) == 1:
         board_num = copy.deepcopy(create_board(level))
     return board_num
 
 # Function drawing board with numbers
 def draw_board(mouse_pos, play_time, mouse_pos_click):
-    global lost, start, board_num, reset_board, lose_strike, level
+    global lost, start, board_num, reset_board, lose_strike, level, solve_board
     # Rectangle parameters
     width = 100
     height = 100
@@ -149,9 +150,10 @@ def draw_board(mouse_pos, play_time, mouse_pos_click):
             if event.type == MOUSEBUTTONDOWN and event.button == 1:
                 start = time.time()
                 board_num = create_board(level)
+                solve_board = [[]]
                 while len(solve_board) == 1:
                     board_num = create_board(level)
-                    solve()
+                    solve(board_num)
                 reset_board = copy.deepcopy(board_num)
                 lost = False
                 lose_strike = 0
@@ -175,19 +177,93 @@ def possible(y, x, n):
                 return False
     return True
 
+# New Solver works better
+def default_sudoku_constraints(prob, grid_vars, rows, cols, grids, values):
+    # Constraint to ensure only one value is filled for a cell
+    for row in rows:
+        for col in cols:
+                prob.addConstraint(plp.LpConstraint(e=plp.lpSum([grid_vars[row][col][value] for value in values]),
+                                        sense=plp.LpConstraintEQ, rhs=1, name=f"constraint_sum_{row}_{col}"))
+
+
+    # Constraint to ensure that values from 1 to 9 is filled only once in a row        
+    for row in rows:
+        for value in values:
+            prob.addConstraint(plp.LpConstraint(e=plp.lpSum([grid_vars[row][col][value]*value  for col in cols]),
+                                        sense=plp.LpConstraintEQ, rhs=value, name=f"constraint_uniq_row_{row}_{value}"))
+
+    # Constraint to ensure that values from 1 to 9 is filled only once in a column        
+    for col in cols:
+        for value in values:
+            prob.addConstraint(plp.LpConstraint(e=plp.lpSum([grid_vars[row][col][value]*value  for row in rows]),
+                                        sense=plp.LpConstraintEQ, rhs=value, name=f"constraint_uniq_col_{col}_{value}"))
+
+
+    # Constraint to ensure that values from 1 to 9 is filled only once in the 3x3 grid       
+    for grid in grids:
+        grid_row  = int(grid/3)
+        grid_col  = int(grid%3)
+
+        for value in values:
+            prob.addConstraint(plp.LpConstraint(e=plp.lpSum([grid_vars[grid_row*3+row][grid_col*3+col][value]*value  for col in range(0,3) for row in range(0,3)]),
+                                        sense=plp.LpConstraintEQ, rhs=value, name=f"constraint_uniq_grid_{grid}_{value}"))
+
+def prefilled_constraints(prob, input_sudoku, grid_vars, rows, cols, values):
+    for row in rows:
+        for col in cols:
+            if(input_sudoku[row][col] != 0):
+                prob.addConstraint(plp.LpConstraint(e=plp.lpSum([grid_vars[row][col][value]*value  for value in values]), 
+                                                    sense=plp.LpConstraintEQ, 
+                                                    rhs=input_sudoku[row][col],
+                                                    name=f"constraint_prefilled_{row}_{col}"))
+
+def extract_solution(grid_vars, rows, cols, values):
+    solution = [[0 for col in cols] for row in rows]
+    grid_list = []
+    for row in rows:
+        for col in cols:
+            for value in values:
+                if plp.value(grid_vars[row][col][value]):
+                    solution[row][col] = value 
+    return solution
+
+def solve(input_sudoku):
+    global solve_board
+    prob = plp.LpProblem("Sudoku Solver")
+    rows = range(0,9)
+    cols = range(0,9)
+    grids = range(0,9)
+    values = range(1,10)
+
+    grid_vars = plp.LpVariable.dicts("grid_value", (rows, cols, values), cat='Binary')
+
+    objective = plp.lpSum(0)
+    prob.setObjective(objective)
+
+    default_sudoku_constraints(prob, grid_vars, rows, cols, grids, values)
+
+    prefilled_constraints(prob, input_sudoku, grid_vars, rows, cols, values)
+
+    prob.solve()
+    solution_status = plp.LpStatus[prob.status]
+    print(f'Solution Status = {plp.LpStatus[prob.status]}')
+    if solution_status == 'Optimal':
+        solve_board = copy.deepcopy(extract_solution(grid_vars, rows, cols, values))
+
+# Old solver works fine but sometimes can hit max recursion depth
 # Function solving entire board 
-def solve():
-    global board_num, solve_board
-    for y in range(9):
-        for x in range(9):
-            if board_num[y][x] == 0:
-                for n in range(1, 10):
-                    if possible(y, x, n):
-                        board_num[y][x] = n
-                        solve()
-                        board_num[y][x] = 0
-                return
-    solve_board = copy.deepcopy(board_num)
+# def solve():
+#     global board_num, solve_board
+#     for y in range(9):
+#         for x in range(9):
+#             if board_num[y][x] == 0:
+#                 for n in range(1, 10):
+#                     if possible(y, x, n):
+#                         board_num[y][x] = n
+#                         solve()
+#                         board_num[y][x] = 0
+#                 return
+#     solve_board = copy.deepcopy(board_num)
 
 # Function writing number on specific position from user and counting wrong numbers
 def user_input(position_num):
@@ -253,9 +329,9 @@ def menu():
             loop = False
         if event.type == MOUSEBUTTONDOWN and event.button == 1:
             if easy_btn.collidepoint(mouse_pos):
-                level = 32
-            elif medium_btn.collidepoint(mouse_pos):
                 level = 30
+            elif medium_btn.collidepoint(mouse_pos):
+                level = 28
             elif hard_btn.collidepoint(mouse_pos):
                 level = 26           
     if level > 0:
