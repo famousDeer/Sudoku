@@ -49,7 +49,7 @@ If you wanna start new game, just click white button and choose level again
 </div>
 
 ## :ghost: Solver
-I used solver from this YouTube video :point_right: https://youtu.be/G_UYXzGuqvM
+I used solver from this site :point_right: https://towardsdatascience.com/solve-sudoku-using-linear-programming-python-pulp-b41b29f479f3 
 
 # :bulb: Future Functions
 * :heavy_check_mark: Game over create new board
@@ -60,5 +60,6 @@ I used solver from this YouTube video :point_right: https://youtu.be/G_UYXzGuqvM
 * :lock: Complete level window
 # :lady_beetle: Known Issues
 * :heavy_check_mark: ~~New Game button do not create new board~~
-* :x: First load is very long
+* :x: Creating new board can take some time
 * :x: Any button can count as a wrong number
+
