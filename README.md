@@ -60,6 +60,6 @@ I used solver from this site :point_right: https://towardsdatascience.com/solve-
 * :lock: Complete level window
 # :lady_beetle: Known Issues
 * :heavy_check_mark: ~~New Game button do not create new board~~
-* :x: Creating new board can take some time
+* :x: Creating new board on easy level can take some time
 * :x: Any button can count as a wrong number
 
