@@ -79,9 +79,9 @@ def create_board(level):
     [0, 0, 0, 0, 0, 0, 0, 0, 0]]
     num = 0
     while num < level:
-        pos_x = random.randrange(0, 9)
-        pos_y = random.randrange(0, 9)
-        numb = random.randrange(1, 10)
+        pos_x = random.randint(0, 8)
+        pos_y = random.randint(0, 8)
+        numb = random.randint(1, 9)
         if possible(pos_y, pos_x, numb) and board_num[pos_y][pos_x] == 0:
             num += 1
             board_num[pos_y][pos_x] = numb
